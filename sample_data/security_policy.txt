@@ -1,0 +1,9 @@
+EduSecure protects all student and institutional data using AES-256 encryption at rest.
+
+All communication between users and the platform is secured using TLS 1.2 or higher.
+
+The platform supports authentication through email/password and OAuth providers such as Google and Microsoft.
+
+Multi-factor authentication (MFA) is available using authenticator applications.
+
+EduSecure implements role-based access control (RBAC) to ensure users only access authorized resources.

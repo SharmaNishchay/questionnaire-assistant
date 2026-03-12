@@ -1,0 +1,27 @@
+EduSecure Privacy Policy and Data Governance
+
+EduSecure is committed to protecting the privacy of students, educators, and institutional partners in compliance with FERPA (Family Educational Rights and Privacy Act) and COPPA (Children's Online Privacy Protection Act).
+
+Data Collection:
+EduSecure collects only the data necessary to deliver its educational services, including student names, email addresses, assignment submissions, and learning progress metrics. No personally identifiable information (PII) is sold or shared with third-party advertisers.
+
+Data Retention:
+Student records are retained for a maximum of 7 years after the student's last active enrollment, or as required by applicable law. Upon contract termination with an institution, all associated data is securely deleted within 90 days.
+
+Third-Party Sharing:
+EduSecure does not share student data with third parties except for: (a) sub-processors required to operate the platform (e.g., AWS infrastructure), all of whom are bound by data processing agreements; (b) compliance with lawful government requests. A complete list of sub-processors is available upon request.
+
+Data Residency:
+All student data is stored within the United States and Canada. EduSecure does not transfer student data outside of North America without explicit institutional consent.
+
+Data Access:
+Students and parents (for minors) have the right to request access to, correction of, or deletion of their personal data. Institutions may submit data access requests through the EduSecure admin portal.
+
+Breach Notification:
+In the event of a security breach that affects student data, EduSecure will notify affected institutions within 72 hours of discovery, in accordance with applicable data breach notification laws.
+
+FERPA Compliance:
+EduSecure acts as a "school official" under FERPA and maintains education records on behalf of partner institutions. Institutions retain ownership and control of all student records.
+
+COPPA Compliance:
+For students under the age of 13, EduSecure requires verified parental consent before collecting any personal information. Features that involve public sharing are disabled by default for users identified as minors.

@@ -1,0 +1,7 @@
+EduSecure infrastructure is hosted on Amazon Web Services (AWS).
+
+Primary data centers are located in the United States and Canada.
+
+Access to production infrastructure is restricted to authorized DevOps engineers and senior platform administrators.
+
+All production access requires VPN connectivity and role-based access permissions.

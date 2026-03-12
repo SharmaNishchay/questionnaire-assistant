@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.name }} - EduSecure</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>🎓 EduSecure Assistant</h1>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <a href="/dashboard" style="color: #666; text-decoration: none;">← Back to Dashboard</a>
+                <h2 style="margin-top: 10px;">{{ project.name }}</h2>
+                <p style="color: #666;">Status: <span class="badge badge-{{ project.status }}">{{ project.status }}</span>
+                {% if project.status == 'draft' and questions %}
+                <span style="font-size:0.8rem; color:#888; margin-left:8px;">— upload reference docs then click <strong>Generate Answers</strong></span>
+                {% endif %}
+                </p>
+            </div>
+            <div>
+                {% if project.status in ['draft', 'generated'] and questions %}
+                <form action="/projects/{{ project.id }}/generate" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">
+                        {% if project.status == 'draft' %}Generate Answers{% else %}Regenerate Answers{% endif %}
+                    </button>
+                </form>
+                {% endif %}
+                
+                {% if project.status in ['generated', 'reviewed', 'exported'] %}
+                <form action="/projects/{{ project.id }}/export" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-success">Export Questionnaire</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Parse error banner -->
+        {% if parse_error %}
+        <div style="background:#fff3cd; border:1px solid #ffc107; color:#856404; border-radius:8px; padding:16px 20px; margin-bottom:20px;">
+            <strong>⚠️ Questionnaire file could not be read:</strong><br>
+            <span style="font-size:0.9rem;">{{ parse_error }}</span>
+            <br><br>
+            <strong>How to fix:</strong> Open your file in Excel and save it as <em>Excel Workbook (.xlsx)</em>, then re-upload below.
+        </div>
+        {% endif %}
+
+        <!-- Summary Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>{{ questions|length }}</h3>
+                <p>Total Questions</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ answered_count }}</h3>
+                <p>Answered</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ not_found_count }}</h3>
+                <p>Not Found</p>
+            </div>
+        </div>
+
+        <!-- Questions and Answers -->
+        <div class="card">
+            <h3>Questions & Answers</h3>
+            
+            {% if not questions %}
+            <div style="padding:10px 0;">
+                <p style="color:#999; font-style:italic; margin-bottom:20px;">No questions found in this questionnaire.</p>
+                <div style="background:#f8f9fa; border:1px solid #dee2e6; border-radius:8px; padding:20px;">
+                    <strong>Re-upload Questionnaire File</strong>
+                    <p style="font-size:0.875rem; color:#666; margin:8px 0 16px;">
+                        Upload an <strong>.xlsx</strong>, <strong>.xls</strong>, or <strong>.csv</strong> file.
+                        Make sure it has a header row with a cell containing the word <strong>"Question"</strong>
+                        and question text in that column.
+                    </p>
+                    <form action="/projects/{{ project.id }}/reupload" method="post" enctype="multipart/form-data"
+                          style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <input type="file" name="questionnaire_file" accept=".xlsx,.xls,.csv" required
+                               style="flex:1; min-width:200px;">
+                        <button type="submit" class="btn btn-primary">Re-upload &amp; Parse</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            
+            {% for question in questions %}
+            <div class="question-card">
+                <div class="question-header">
+                    <strong>Q{{ question.question_number }}:</strong> {{ question.question_text }}
+                </div>
+                
+                {% if question.answer %}
+                <div class="answer-section">
+                    <form action="/projects/{{ project.id }}/questions/{{ question.id }}/update" method="post">
+                        <div class="form-group">
+                            <label><strong>Answer:</strong>
+                                {% if question.answer.confidence_score is not none %}
+                                {% set pct = (question.answer.confidence_score * 100) | round(1) %}
+                                {% set clr = "green" if question.answer.confidence_score >= 0.6 else ("orange" if question.answer.confidence_score >= 0.3 else "red") %}
+                                <span class="confidence-badge confidence-{{ clr }}">Confidence: {{ pct }}%</span>
+                                {% endif %}
+                            </label>
+                            <textarea name="answer_text" rows="4" class="form-control">{{ question.answer.answer_text }}</textarea>
+                        </div>
+                        
+                        {% if question.answer.citations %}
+                        <div class="citations">
+                            <strong>Citations:</strong>
+                            <ul>
+                                {% for citation in question.answer.citations %}
+                                <li>
+                                    <strong>{{ citation.source }}</strong>
+                                    {% if citation.snippet %}
+                                    <br><em>"{{ citation.snippet[:150] }}..."</em>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-small">Save Changes</button>
+                    </form>
+                    <form action="/projects/{{ project.id }}/questions/{{ question.id }}/regenerate" method="post" style="display:inline; margin-left: 8px;">
+                        <button type="submit" class="btn btn-small" style="background:#f0f4ff; color:#4f46e5; border:1px solid #c7d2fe;">↺ Regenerate</button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="answer-section">
+                    <p style="color: #999; font-style: italic;">No answer generated yet. Click "Generate Answers" above.</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

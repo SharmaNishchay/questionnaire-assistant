@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - EduSecure</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { background: #f5f7fa; }
+        .auth-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-box {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 420px;
+        }
+        .auth-logo { text-align: center; margin-bottom: 8px; font-size: 2rem; }
+        .auth-title { text-align: center; font-size: 1.5rem; font-weight: 700; color: #1a1a2e; margin: 0 0 4px; }
+        .auth-sub { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 28px; }
+        .error-msg {
+            background: #fff0f0; border: 1px solid #ffcccc; color: #c0392b;
+            border-radius: 6px; padding: 10px 14px; font-size: 0.875rem; margin-bottom: 16px;
+        }
+        .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 24px; }
+        .tab-btn {
+            flex: 1; background: none; border: none; padding: 10px; font-size: 0.95rem;
+            font-weight: 600; color: #999; cursor: pointer; transition: color 0.2s;
+            border-bottom: 2px solid transparent; margin-bottom: -2px;
+        }
+        .tab-btn.active { color: #4f46e5; border-bottom-color: #4f46e5; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.875rem; font-weight: 500; color: #333; margin-bottom: 6px; }
+        .form-group input {
+            width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;
+            font-size: 0.95rem; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .form-group input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .btn-primary-full {
+            width: 100%; padding: 12px; background: #4f46e5; color: white; border: none;
+            border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-primary-full:hover { background: #4338ca; }
+    </style>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-box">
+            <div class="auth-logo">🎓</div>
+            <h1 class="auth-title">EduSecure</h1>
+            <p class="auth-sub">AI-Powered Security Questionnaire Assistant</p>
+
+            {% if error %}
+            <div class="error-msg">
+                {% if error == 'invalid_credentials' %}Invalid email or password. Please try again.
+                {% elif error == 'email_exists' %}An account with that email already exists. Please sign in.
+                {% else %}An error occurred. Please try again.{% endif %}
+            </div>
+            {% endif %}
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+                <button class="tab-btn" onclick="switchTab('signup')">Create Account</button>
+            </div>
+
+            <!-- Login Tab -->
+            <div id="tab-login" class="tab-panel active">
+                <form action="/auth/login" method="post">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" name="email" required placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" name="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-primary-full">Sign In</button>
+                </form>
+            </div>
+
+            <!-- Signup Tab -->
+            <div id="tab-signup" class="tab-panel">
+                <form action="/auth/signup" method="post">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" name="full_name" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" name="email" required placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" name="password" required placeholder="At least 6 characters" minlength="6">
+                    </div>
+                    <button type="submit" class="btn-primary-full">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'signup'));
+            });
+            document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+            document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+        }
+        if (new URLSearchParams(window.location.search).get('tab') === 'signup') switchTab('signup');
+    </script>
+</body>
+</html>

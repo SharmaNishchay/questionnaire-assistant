@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EduSecure</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <h1>🎓 EduSecure Assistant</h1>
+            <div class="nav-links">
+                <a href="/dashboard" class="active">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h2>Welcome, {{ user.full_name or user.email }}!</h2>
+        
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>{{ project_count }}</h3>
+                <p>Projects</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ document_count }}</h3>
+                <p>Reference Documents</p>
+            </div>
+        </div>
+
+        <!-- Create New Project -->
+        <div class="card">
+            <h3>Create New Project</h3>
+            <form action="/projects/create" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="project_name">Project Name</label>
+                    <input type="text" id="project_name" name="project_name" required placeholder="e.g., Security Review Q1 2026">
+                </div>
+                
+                <div class="form-group">
+                    <label for="questionnaire_file">Upload Questionnaire (Excel/CSV)</label>
+                    <input type="file" id="questionnaire_file" name="questionnaire_file" accept=".xlsx,.xls,.csv" required>
+                    <small>Upload an Excel or CSV file with questions</small>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Project</button>
+            </form>
+        </div>
+
+        <!-- Reference Documents -->
+        <div class="card">
+            <h3>Reference Documents ({{ document_count }})</h3>
+            <p>Upload documents that contain information to answer questionnaires (policies, procedures, etc.)</p>
+            
+            <form action="/documents/upload" method="post" enctype="multipart/form-data" style="margin-bottom: 20px;">
+                <div class="form-group">
+                    <input type="file" name="file" accept=".txt,.pdf" required>
+                    <button type="submit" class="btn">Upload Document</button>
+                </div>
+            </form>
+
+            {% if documents %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Document Name</th>
+                        <th>Type</th>
+                        <th>Uploaded</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td>{{ doc.filename }}</td>
+                        <td>{{ doc.file_type.upper() }}</td>
+                        <td>{{ doc.uploaded_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <form action="/documents/{{ doc.id }}/delete" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Delete this document?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No reference documents uploaded yet. Upload documents to enable answer generation.</p>
+            {% endif %}
+        </div>
+
+        <!-- Recent Projects -->
+        <div class="card">
+            <h3>Recent Projects</h3>
+            {% if projects %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Project Name</th>
+                        <th>Status</th>
+                        <th>Questions</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in projects %}
+                    <tr>
+                        <td><strong>{{ project.name }}</strong></td>
+                        <td><span class="badge badge-{{ project.status }}">{{ project.status }}</span></td>
+                        <td>{{ project.question_count }}</td>
+                        <td>{{ project.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <a href="/projects/{{ project.id }}" class="btn btn-small">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No projects yet. Create your first project above!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
