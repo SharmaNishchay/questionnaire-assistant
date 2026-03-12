@@ -1,3 +1,13 @@
+---
+title: Alma
+emoji: 🎓
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # EduSecure Questionnaire Assistant
 
 An AI-powered web app that automates vendor/compliance questionnaire responses by grounding every answer in your own reference documentation.
